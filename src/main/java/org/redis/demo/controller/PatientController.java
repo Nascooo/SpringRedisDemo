@@ -2,6 +2,7 @@ package org.redis.demo.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.redis.demo.entity.Patient;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.HashOperations;
@@ -53,6 +54,13 @@ public class PatientController {
         Optional<Patient> patient = Optional.ofNullable(opsForHash.get(PATIENT, id));
 
         return patient.orElse(null);
+    }
+
+    @DeleteMapping("{id}")
+    @CacheEvict(value = PATIENT, key = "#id")
+    public void delete(@PathVariable Long id) {
+        HashOperations<String, Long, Patient> opsForHash = customRedisTemplate.opsForHash();
+        opsForHash.delete(PATIENT, id);
     }
 
 

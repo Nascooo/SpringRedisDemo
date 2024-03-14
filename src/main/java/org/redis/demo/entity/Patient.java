@@ -1,11 +1,13 @@
 package org.redis.demo.entity;
 
 
-import lombok.Data;
+import lombok.*;
 
 import java.io.Serializable;
 
 @Data
+@ToString
+@EqualsAndHashCode
 public class Patient implements Serializable {
 
 
