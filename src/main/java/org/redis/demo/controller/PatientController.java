@@ -1,7 +1,7 @@
 package org.redis.demo.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.redis.demo.entity.Patient;
+import org.redis.demo.model.PatientDto;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -19,40 +19,40 @@ public class PatientController {
     private static final String PATIENT = "PATIENT";
     public static final String PATIENT_CACHE_MANAGER = "patientCacheManager";
 
-    private final RedisTemplate<String, Patient> patientRedisTemplate;
+    private final RedisTemplate<String, PatientDto> patientRedisTemplate;
 
 
     @PostMapping
-    @Cacheable(value = PATIENT, key = "#patient.id", cacheManager = PATIENT_CACHE_MANAGER)
-    public Patient createNew(@RequestBody Patient patient) {
+    @Cacheable(value = PATIENT, key = "#patientDto.id", cacheManager = PATIENT_CACHE_MANAGER)
+    public PatientDto createNew(@RequestBody PatientDto patientDto) {
 
-        HashOperations<String, Long, Patient> opsForHash = patientRedisTemplate.opsForHash();
-        boolean isKeyExist = opsForHash.hasKey(PATIENT, patient.getId());
+        HashOperations<String, Long, PatientDto> opsForHash = patientRedisTemplate.opsForHash();
+        boolean isKeyExist = opsForHash.hasKey(PATIENT, patientDto.getId());
         if (isKeyExist) {
-            return opsForHash.get(PATIENT, patient.getId());
+            return opsForHash.get(PATIENT, patientDto.getId());
         }
 
-        opsForHash.put(PATIENT, patient.getId(), patient);
+        opsForHash.put(PATIENT, patientDto.getId(), patientDto);
 
-        return opsForHash.get(PATIENT, patient.getId());
+        return opsForHash.get(PATIENT, patientDto.getId());
     }
 
     @PutMapping
-    @CachePut(value = PATIENT, key = "#patient.id", cacheManager = PATIENT_CACHE_MANAGER)
-    public Patient update(@RequestBody Patient patient) {
+    @CachePut(value = PATIENT, key = "#patientDto.id", cacheManager = PATIENT_CACHE_MANAGER)
+    public PatientDto update(@RequestBody PatientDto patientDto) {
 
-        HashOperations<String, Long, Patient> opsForHash = patientRedisTemplate.opsForHash();
-        opsForHash.put(PATIENT, patient.getId(), patient);
+        HashOperations<String, Long, PatientDto> opsForHash = patientRedisTemplate.opsForHash();
+        opsForHash.put(PATIENT, patientDto.getId(), patientDto);
 
-        return opsForHash.get(PATIENT, patient.getId());
+        return opsForHash.get(PATIENT, patientDto.getId());
     }
 
     @GetMapping("{id}")
     @Cacheable(value = PATIENT, key = "#id", cacheManager = PATIENT_CACHE_MANAGER, unless = "#result == null")
-    public Patient update(@PathVariable Long id) {
+    public PatientDto update(@PathVariable Long id) {
 
-        HashOperations<String, Long, Patient> opsForHash = patientRedisTemplate.opsForHash();
-        Optional<Patient> patient = Optional.ofNullable(opsForHash.get(PATIENT, id));
+        HashOperations<String, Long, PatientDto> opsForHash = patientRedisTemplate.opsForHash();
+        Optional<PatientDto> patient = Optional.ofNullable(opsForHash.get(PATIENT, id));
 
         return patient.orElse(null);
     }
@@ -60,7 +60,7 @@ public class PatientController {
     @DeleteMapping("{id}")
     @CacheEvict(value = PATIENT, key = "#id")
     public void delete(@PathVariable Long id) {
-        HashOperations<String, Long, Patient> opsForHash = patientRedisTemplate.opsForHash();
+        HashOperations<String, Long, PatientDto> opsForHash = patientRedisTemplate.opsForHash();
         opsForHash.delete(PATIENT, id);
     }
 
