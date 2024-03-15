@@ -3,6 +3,7 @@ package org.redis.demo.entity;
 
 import lombok.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 @Data
@@ -11,7 +12,8 @@ import java.io.Serializable;
 public class Patient implements Serializable {
 
 
-    private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = 6743010879607261063L;
 
 
     private Long id;

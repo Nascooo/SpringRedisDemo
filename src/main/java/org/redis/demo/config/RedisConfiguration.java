@@ -11,14 +11,12 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
 
 @Configuration
-@EnableRedisRepositories
 @EnableCaching
 public class RedisConfiguration {
 
@@ -30,7 +28,7 @@ public class RedisConfiguration {
 
     @Bean
     @Primary
-    public RedisTemplate<String, Patient> customRedisTemplate() {
+    public RedisTemplate<String, Patient> patientRedisTemplate() {
         RedisTemplate<String, Patient> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactory());
         template.setKeySerializer(new StringRedisSerializer());

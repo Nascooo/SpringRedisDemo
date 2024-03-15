@@ -19,15 +19,16 @@ public class PatientController {
     private static final String PATIENT = "PATIENT";
     public static final String PATIENT_CACHE_MANAGER = "patientCacheManager";
 
-    private final RedisTemplate<String, Patient> customRedisTemplate;
+    private final RedisTemplate<String, Patient> patientRedisTemplate;
 
 
     @PostMapping
     @Cacheable(value = PATIENT, key = "#patient.id", cacheManager = PATIENT_CACHE_MANAGER)
     public Patient createNew(@RequestBody Patient patient) {
 
-        HashOperations<String, Long, Patient> opsForHash = customRedisTemplate.opsForHash();
-        if (opsForHash.hasKey(PATIENT, patient.getId())) {
+        HashOperations<String, Long, Patient> opsForHash = patientRedisTemplate.opsForHash();
+        boolean isKeyExist = opsForHash.hasKey(PATIENT, patient.getId());
+        if (isKeyExist) {
             return opsForHash.get(PATIENT, patient.getId());
         }
 
@@ -40,7 +41,7 @@ public class PatientController {
     @CachePut(value = PATIENT, key = "#patient.id", cacheManager = PATIENT_CACHE_MANAGER)
     public Patient update(@RequestBody Patient patient) {
 
-        HashOperations<String, Long, Patient> opsForHash = customRedisTemplate.opsForHash();
+        HashOperations<String, Long, Patient> opsForHash = patientRedisTemplate.opsForHash();
         opsForHash.put(PATIENT, patient.getId(), patient);
 
         return opsForHash.get(PATIENT, patient.getId());
@@ -50,7 +51,7 @@ public class PatientController {
     @Cacheable(value = PATIENT, key = "#id", cacheManager = PATIENT_CACHE_MANAGER, unless = "#result == null")
     public Patient update(@PathVariable Long id) {
 
-        HashOperations<String, Long, Patient> opsForHash = customRedisTemplate.opsForHash();
+        HashOperations<String, Long, Patient> opsForHash = patientRedisTemplate.opsForHash();
         Optional<Patient> patient = Optional.ofNullable(opsForHash.get(PATIENT, id));
 
         return patient.orElse(null);
@@ -59,7 +60,7 @@ public class PatientController {
     @DeleteMapping("{id}")
     @CacheEvict(value = PATIENT, key = "#id")
     public void delete(@PathVariable Long id) {
-        HashOperations<String, Long, Patient> opsForHash = customRedisTemplate.opsForHash();
+        HashOperations<String, Long, Patient> opsForHash = patientRedisTemplate.opsForHash();
         opsForHash.delete(PATIENT, id);
     }
 
