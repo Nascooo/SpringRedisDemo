@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("v2/patient")
+@RequestMapping("v2/patients")
 @RequiredArgsConstructor
 public class PatientControllerV2 {
 
